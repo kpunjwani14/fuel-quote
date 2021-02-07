@@ -1,11 +1,15 @@
 import React from "react";
 import Navigation from "../../Layout/Navbar/Navigation";
+import CardForm from "./Components/CardForm";
 
 function ProfileManagement() {
     return (
         <>
             <Navigation />
-            <h1>Profile Management</h1>
+            <br />
+            <div className='container'>
+                <CardForm />
+            </div>
         </>
     )
 };
