@@ -10,7 +10,6 @@ import QuoteForm from "./Pages/QuoteForm/index";
 function App() {
   return (
     <>
- Navbar
       <Router >
         <Switch>
           <Route path='/' exact component={QuoteHistory} />
@@ -18,9 +17,6 @@ function App() {
           <Route path='/request-quote' exact component={QuoteForm} />
         </Switch>
       </Router>
-
-      <h1>Fueling my feelings</h1>
- main
     </>
   );
 }
