@@ -1,11 +1,15 @@
 import React from "react";
 import Navigation from "../../Layout/Navbar/Navigation";
+import CardForm from "./Components/CardForm";
 
 function QuoteForm() {
     return (
         <>
             <Navigation />
-            <h1>Request a Quote</h1>
+            <br />
+            <div className='container'>
+                <CardForm />
+            </div>
         </>
     )
 };

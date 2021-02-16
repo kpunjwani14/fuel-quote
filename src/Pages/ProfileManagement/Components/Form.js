@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Col } from 'react-bootstrap';
-import SubmitButton from "./SubmitButton";
+import SubmitButton from "../../../Components/Buttons/SubmitButton";
 import StatesDropdown from "./StatesDropdown";
 
 function ProfileManagement() {
@@ -95,7 +95,7 @@ function ProfileManagement() {
                     </Form.Group>
                 </Form.Row>
 
-                <SubmitButton />
+                <SubmitButton text={'Save'} />
             </Form>
         </>
     )
