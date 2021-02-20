@@ -95,7 +95,7 @@ function ProfileManagement() {
                     </Form.Group>
                 </Form.Row>
 
-                <SubmitButton text={'Save'} />
+                <SubmitButton text={'Save'} type={'submit'} />
             </Form>
         </>
     )
