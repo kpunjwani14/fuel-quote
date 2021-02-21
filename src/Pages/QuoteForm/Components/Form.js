@@ -46,7 +46,7 @@ function ProfileManagement() {
                         <Form.Label className="required">Gallons requested</Form.Label>
                         <div>
                             <Button onClick={decrement} variant="primary">-</Button>{' '}
-                            <h4 style={{ display: "inline", padding: "5px" }}>{gallons}</h4>
+                            <h5 style={{ display: "inline", padding: "5px" }}>{gallons}</h5>
                             <Button onClick={increment} variant="primary">+</Button>{' '}
                         </div>
                     </Form.Group>
