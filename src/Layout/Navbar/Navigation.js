@@ -12,7 +12,7 @@ function Navigation() {
                     <Nav.Link href="./request-quote">Request a Quote</Nav.Link>
                 </Nav>
                 <Nav>
-                    <Nav.Link href="#deets">Logout</Nav.Link>
+                    <Nav.Link href="./login">Login</Nav.Link>
                 </Nav>
             </Navbar>
         </>

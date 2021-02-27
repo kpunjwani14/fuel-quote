@@ -5,7 +5,8 @@ function QuoteHistory() {
     return (
         <>
             <Navigation />
-            <h1>Quote History (Also the homepage)</h1>
+            <h1>Login to see your Quote History</h1>
+            <h2>Quote History (Also the homepage)</h2>
         </>
     )
 };
