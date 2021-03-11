@@ -16,6 +16,7 @@ function App() {
           <Route path='/' exact component={QuoteHistory} />
           <Route path='/profile' exact component={ProfileManagement} />
           <Route path='/request-quote' exact component={QuoteForm} />
+          <Route path='/request-quote' exact component={QuoteHistory} />
           <Route path='/login' exact component={LoginScreen} />
         </Switch>
       </Router>
