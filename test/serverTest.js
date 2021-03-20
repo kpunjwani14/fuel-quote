@@ -34,9 +34,27 @@ describe('App',()=>{
         })
     })
     it('app should not change profile',()=>{
-        request(app).post('/profile/0').set('Content-Type','application/json').expect(200,(err,res)=>{
+        request(app).post('/profile/0').set('Content-Type','application/json').send({}).expect(200,(err,res)=>{
+            assert.equal(res.status,400)
+        })
+    })
+    it('app should change profile',()=>{
+        request(app).post('/profile/0').set('Content-Type','application/json').send({name:'shehzad yousaf', zipcode:'77498',state:'TX',address:'11324 apple hill',city:'austin'}).expect(200,(err,res)=>{
             assert.equal(res.status,200)
         })
+    })
+    it('app should get history of quotes',()=>{request(app).get('/showtable/0').expect(200,(err,res)=>{
+        console.log(res.status,'hi')
+        
+        assert.equal(res.status,200)})
+    })
+    it('app should not get history of quotes',()=>{
+        request(app).get('/showtable/1').expect(200,(err,res)=>{
+            console.log(res.status,'hi')
+            
+            assert.equal(res.status,401)})
+        
+
     })
 
 })
