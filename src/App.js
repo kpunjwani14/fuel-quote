@@ -12,9 +12,10 @@ function App() {
     <>
       <Router >
         <Switch>
-          <Route path='/' exact component={QuoteHistory} />
-          <Route path='/profile' exact component={ProfileManagement} />
-          <Route path='/request-quote' exact component={QuoteForm} />
+          <Route path='/history/:id' exact component={QuoteHistory} />
+          <Route path='/profile/:id' exact component={ProfileManagement} />
+          <Route path='/request-quote/:id' exact component={QuoteForm} />
+          <Route path='/'  component={LoginScreen} />
         </Switch>
       </Router>
     </>

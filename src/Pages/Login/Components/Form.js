@@ -1,0 +1,80 @@
+import React, { useState } from "react";
+import { Form, Col } from 'react-bootstrap';
+import SubmitButton from "../../../Components/Buttons/SubmitButton";
+import axios from 'axios'
+import StatesDropdown from "./StatesDropdown";
+import { useHistory } from "react-router-dom";
+
+function LoginScreen(props) {
+    const [validated, setValidated] = useState(false);
+    const [logForm,setLogForm] = useState({})
+    let history = useHistory()
+    const onLogChange = (event)=>{
+        setLogForm(prevState=>({...prevState,[event.target.name]:event.target.value}))
+    }
+    const handleSubmit = async (event) => {
+        const form = event.currentTarget;
+        
+        event.preventDefault();
+        event.stopPropagation();
+        if (form.checkValidity() === true) {
+            try{
+                const res = await axios.post('http://localhost:3001/login',logForm)
+                
+                history.push('/profile/'+res.data.id)
+                
+            }
+            catch(e){
+                console.log(e)
+                setValidated(true);
+            }
+        }
+        else
+            setValidated(true);
+
+        
+    }
+
+    return (
+        <>
+            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+                <Form.Row>
+                    <Form.Group as={Col} md="6" controlId="validationCustom01">
+                        <Form.Label className="required">Username</Form.Label>
+                        <Form.Control
+                            minLength={3}
+                            maxLength={50}
+                            required
+                            name='username'
+                            onChange={onLogChange}
+                            type="text"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            Please provide a valid name.
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                </Form.Row>
+
+                <Form.Row>
+                    <Form.Group as={Col} md="6" controlId="validationCustom07">
+                        <Form.Label className="required">Password</Form.Label>
+                        <Form.Control
+                            minLength={10}
+                            maxLength={100}
+                            required
+                            name='password'
+                            onChange={onLogChange}
+                            type="text"
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            Please provide a valid city.
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                </Form.Row>
+                <SubmitButton text={'Login'} type={'submit'} />
+            </Form>
+        </>
+    )
+};
+
+export default LoginScreen;
