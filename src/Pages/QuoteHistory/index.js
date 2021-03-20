@@ -79,7 +79,7 @@ function QuoteHistory () {
         }).catch(e=>history.push('/'));
       };
 
-function QuoteHistory() {
+
     return (
         <div className="App">
           <div className="table">
