@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from 'react-bootstrap';
 
-function SubmitButton(props) {
+function RegisterButton(props) {
     const { text, type } = props;
     return (
         <>
@@ -10,4 +10,4 @@ function SubmitButton(props) {
     )
 };
 
-export default SubmitButton;
+export default RegisterButton;
