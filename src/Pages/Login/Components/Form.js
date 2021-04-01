@@ -1,19 +1,38 @@
 import React, { useState } from "react";
 import { Form, Col } from 'react-bootstrap';
 import SubmitButton from "../../../Components/Buttons/SubmitButton";
+import axios from 'axios'
 import StatesDropdown from "./StatesDropdown";
+import { useHistory } from "react-router-dom";
 
-function LoginScreen() {
+function LoginScreen(props) {
     const [validated, setValidated] = useState(false);
-
-    const handleSubmit = (event) => {
+    const [logForm,setLogForm] = useState({})
+    let history = useHistory()
+    const onLogChange = (event)=>{
+        setLogForm(prevState=>({...prevState,[event.target.name]:event.target.value}))
+    }
+    const handleSubmit = async (event) => {
         const form = event.currentTarget;
-        console.log(form);
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
+        
+        event.preventDefault();
+        event.stopPropagation();
+        if (form.checkValidity() === true) {
+            try{
+                const res = await axios.post('http://localhost:3001/login',logForm)
+                
+                history.push('/profile/'+res.data.id)
+                
+            }
+            catch(e){
+                console.log(e)
+                setValidated(true);
+            }
         }
-        setValidated(true);
+        else
+            setValidated(true);
+
+        
     }
 
     return (
@@ -26,6 +45,8 @@ function LoginScreen() {
                             minLength={3}
                             maxLength={50}
                             required
+                            name='username'
+                            onChange={onLogChange}
                             type="text"
                         />
                         <Form.Control.Feedback type="invalid">
@@ -41,6 +62,8 @@ function LoginScreen() {
                             minLength={10}
                             maxLength={100}
                             required
+                            name='password'
+                            onChange={onLogChange}
                             type="text"
                         />
                         <Form.Control.Feedback type="invalid">

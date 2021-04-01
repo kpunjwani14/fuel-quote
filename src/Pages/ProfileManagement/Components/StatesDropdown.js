@@ -1,10 +1,13 @@
 import React from "react";
 import { Form } from 'react-bootstrap';
 
-function StatesDropdown() {
+function StatesDropdown(props) {
     return (
         <>
-            <Form.Control as="select" placeholder="State" required>
+            <Form.Control as="select" placeholder="State" required value={props.formData}
+                name='state'
+                onChange={props.onChange}>
+
                 <option value="">Choose...</option>
                 <option value="AL">Alabama</option>
                 <option value="AK">Alaska</option>

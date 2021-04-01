@@ -13,11 +13,18 @@ function App() {
     <>
       <Router >
         <Switch>
+<<<<<<< HEAD
           <Route path='/' exact component={QuoteHistory} />
           <Route path='/profile' exact component={ProfileManagement} />
           <Route path='/request-quote' exact component={QuoteForm} />
           <Route path='/request-quote' exact component={QuoteHistory} />
           <Route path='/login' exact component={LoginScreen} />
+=======
+          <Route path='/history/:id' exact component={QuoteHistory} />
+          <Route path='/profile/:id' exact component={ProfileManagement} />
+          <Route path='/request-quote/:id' exact component={QuoteForm} />
+          <Route path='/'  component={LoginScreen} />
+>>>>>>> 02dd701a5de7b75008e6c9051d4d2f0b4435cdb6
         </Switch>
       </Router>
     </>

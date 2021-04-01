@@ -1,18 +1,32 @@
 import React, { useState } from "react";
 import { Form, Col } from 'react-bootstrap';
 import RegisterButton from "../../../Components/Buttons/RegisterButton";
+import axios from 'axios'
 
-function LoginScreen() {
+function LoginScreen(props) {
     const [validated, setValidated] = useState(false);
-
-    const handleSubmit = (event) => {
+    const [formRegister, setForm] = useState({})
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const form = event.currentTarget;
-        console.log(form);
         if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
+
+        }
+        else {
+            try {
+                const res = await axios.post('http://localhost:3001/register', formRegister)
+                
+            }
+            catch(err) {
+                console.log(err)
+            }
         }
         setValidated(true);
+    }
+    const onInputChange = (event) => {
+        const { target } = event
+        setForm(prevState => ({ ...prevState, [target.name]: target.value }))
     }
 
     return (
@@ -26,6 +40,8 @@ function LoginScreen() {
                             maxLength={50}
                             required
                             type="text"
+                            name='RegisterUsername'
+                            onChange={onInputChange}
                         />
                         <Form.Control.Feedback type="invalid">
                             Please provide a valid username.
@@ -41,6 +57,8 @@ function LoginScreen() {
                             maxLength={100}
                             required
                             type="text"
+                            name='RegisterPassword'
+                            onChange={onInputChange}
                         />
                         <Form.Control.Feedback type="invalid">
                             Please provide a valid password.
@@ -56,6 +74,8 @@ function LoginScreen() {
                             maxLength={100}
                             required
                             type="text"
+                            name='confirm'
+                            onChange={onInputChange}
                         />
                         <Form.Control.Feedback type="invalid">
                             Please ensure the passwords match.
