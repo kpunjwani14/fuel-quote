@@ -14,7 +14,10 @@ function Navigation(props) {
                     <Nav.Link href={id ? ("/profile/" + id) : '/'}>Profile Management</Nav.Link>
                     <Nav.Link href={id ? ("/request-quote/" + id) : '/'}>Request a Quote</Nav.Link>
                 </Nav>
-                {!id && <Nav>
+                {/* {!id && <Nav>
+                    <Nav.Link href="/">Login</Nav.Link>
+                </Nav>} */}
+                {<Nav>
                     <Nav.Link href="/">Logout</Nav.Link>
                 </Nav>}
             </Navbar>

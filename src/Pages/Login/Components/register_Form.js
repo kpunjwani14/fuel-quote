@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Form, Col } from 'react-bootstrap';
 import RegisterButton from "../../../Components/Buttons/RegisterButton";
-import axios from 'axios'
+import axios from 'axios';
+import Notifications, { notify } from 'react-notify-toast';
 
 function LoginScreen(props) {
     const [validated, setValidated] = useState(false);
@@ -11,15 +12,16 @@ function LoginScreen(props) {
         event.stopPropagation();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
-
+            notify.show('Missing fields', 'error', 3000);
         }
         else {
             try {
-                const res = await axios.post('http://localhost:3001/register', formRegister)
-                
+                const res = await axios.post('http://localhost:3001/register', formRegister);
+                notify.show('Success', 'success', 3000);
             }
-            catch(err) {
-                console.log(err)
+            catch (err) {
+                console.log(err);
+                notify.show('Failed to create account', 'error', 3000);
             }
         }
         setValidated(true);

@@ -7,10 +7,12 @@ import QuoteHistory from "./Pages/QuoteHistory/index";
 import ProfileManagement from "./Pages/ProfileManagement/index";
 import QuoteForm from "./Pages/QuoteForm/index";
 import LoginScreen from "./Pages/Login/index";
+import Notifications, { notify } from 'react-notify-toast';
 
 function App() {
   return (
     <>
+      <Notifications />
       <Router >
         <Switch>
           <Route path='/history/:id' exact component={QuoteHistory} />
