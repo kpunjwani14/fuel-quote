@@ -8,11 +8,6 @@
     "@testing-library/user-event": "^12.6.3",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
-<<<<<<< HEAD
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "mysql": "^2.18.1",
-=======
     "chai": "^4.3.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -24,7 +19,6 @@
     "nyc": "^15.1.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
->>>>>>> 02dd701a5de7b75008e6c9051d4d2f0b4435cdb6
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.3",
     "react-date-picker": "^8.0.7",
