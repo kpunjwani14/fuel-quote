@@ -2,37 +2,39 @@ import React, { useState } from "react";
 import { Form, Col } from 'react-bootstrap';
 import SubmitButton from "../../../Components/Buttons/SubmitButton";
 import axios from 'axios'
+import Notifications, { notify } from 'react-notify-toast';
 import StatesDropdown from "./StatesDropdown";
 import { useHistory } from "react-router-dom";
 
 function LoginScreen(props) {
     const [validated, setValidated] = useState(false);
-    const [logForm,setLogForm] = useState({})
+    const [logForm, setLogForm] = useState({})
     let history = useHistory()
-    const onLogChange = (event)=>{
-        setLogForm(prevState=>({...prevState,[event.target.name]:event.target.value}))
+    const onLogChange = (event) => {
+        setLogForm(prevState => ({ ...prevState, [event.target.name]: event.target.value }))
     }
     const handleSubmit = async (event) => {
         const form = event.currentTarget;
-        
+
         event.preventDefault();
         event.stopPropagation();
         if (form.checkValidity() === true) {
-            try{
-                const res = await axios.post('http://localhost:3001/login',logForm)
-                
-                history.push('/profile/'+res.data.id)
-                
+            try {
+                const res = await axios.post('http://localhost:3001/login', logForm);
+
+                history.push('/profile/' + res.data.id);
+                notify.show('Success', 'success', 3000);
             }
-            catch(e){
-                console.log(e)
+            catch (e) {
+                console.log('error', e);
                 setValidated(true);
+                notify.show('Invalid username or password', 'error', 3000);
             }
         }
-        else
+        else {
             setValidated(true);
-
-        
+            notify.show('Missing fields', 'error', 3000);
+        }
     }
 
     return (
@@ -50,7 +52,7 @@ function LoginScreen(props) {
                             type="text"
                         />
                         <Form.Control.Feedback type="invalid">
-                            Please provide a valid name.
+                            Username doesn't meet requirements.
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Form.Row>
@@ -67,7 +69,7 @@ function LoginScreen(props) {
                             type="text"
                         />
                         <Form.Control.Feedback type="invalid">
-                            Please provide a valid city.
+                            Password doesn't meet requirements.
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Form.Row>

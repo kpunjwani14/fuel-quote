@@ -1,13 +1,14 @@
 const express = require("express");
 const app = express();
+const { sequelize, UserCredentials,ClientInformation } = require('../models')
 //const mysql = require('mysql');
 const cors = require("cors");
-const { body, validationResult, check} = require('express-validator');
+const { body, validationResult, check } = require('express-validator');
 const passport = require('passport')
 const session = require('express-session')
 app.use(cors());
 app.use(session({
-  secret:'hello_world',
+  secret: 'hello_world',
   resave: false,
   saveUninitialized: false
 }))
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(passport.initialize())
 app.use(passport.session())
 var users = []
-var ids=0
+var ids = 0
 
 // change stuff here to make it connect to your localhost db 
 // const db = mysql.createConnection({
@@ -27,42 +28,40 @@ var ids=0
 // });
 const local = require('passport-local').Strategy
 start(passport)
-function start(pass){
-    pass.use(new local((username,password,done)=>{
-      
-        const user = users.find(u=>u.username ===  username && u.password === password)
-       
-        if(user == null )
-          return done(null,false,{message:'Credentials Do Not Match Any Current Users'})
-        return done(null,user)
-
-    }))
-    pass.serializeUser((user,done)=>{
-      
-      return done(null,user.id)
-      
-      
-    })
-    pass.deserializeUser((id,done)=>{
-      
-      return done(null,users.find(u=>u.id===id))
-      
-    })
-}
-app.get('/profile/:id',(req,res)=>{
-  console.log(req.params.id)
-  const user =users.find(u=>u.id==req.params.id)
-  if(user == null){
+function start(pass) {
+  pass.use(new local(async (username, password, done) => {
+    const user = await UserCredentials.findOne({where:{Username:username,Password:password}})
     
-    return res.status(400).json({message:'invalid profile'})
+    if (user == null)
+      return done(null, false, { message: 'Credentials Do Not Match Any Current Users' })
+    return done(null, user.dataValues)
+
+  }))
+  pass.serializeUser((user, done) => {
+  
+    return done(null, user.userId)
+
+
+  })
+  pass.deserializeUser(async (id, done) => {
+    const user = await UserCredentials.findOne({where:{userId:id}})
+    return done(null, user)
+
+  })
+}
+app.get('/profile/:id', async (req, res) => {
+  console.log(req.params.id)
+  const user = ClientInformation.findOne({where:{ClientId:req.params.id}} )
+  if (user == null) {
+
+    return res.status(400).json({ message: 'invalid profile' })
   }
   res.send(user)
 })
 
-app.post('/login',passport.authenticate('local'),(req,res)=>{
-  
-    console.log(req.user.id)
-    res.send({id:req.user.id}) 
+app.post('/login', passport.authenticate('local'), (req, res) => {
+
+  res.send({ id: req.user.userId })
 })
 
 
@@ -86,69 +85,66 @@ app.post('/login',passport.authenticate('local'),(req,res)=>{
 //     // );
 // });
 //empty for pricing module 
-app.post('/getPrice',(req,res)=>{
+app.post('/getPrice', (req, res) => {
   res.send('Implementing in Next Assignment')
 })
 app.get("/showtable/:id", (req, res) => {
-    const user =users.find(u=>u.id==req.params.id)
+  const user = users.find(u => u.id == req.params.id)
 
-    if(user==null)
-      return res.status(401).json({message:'unauthorized'})
-    // db.query("SELECT * FROM sys.quote_history", (err, result) => {
-    //   if (err) {
-    //     console.log(err);
-    //   } else {
-    //     // console.log(result);
-    //     res.send(result);
-    //   }
-    // });
-    res.send(user.quoteHistory)
-  });
-  app.post('/profile/:id',check('name').isLength({min:1, max:50}),check('address').isLength({min:10,max:100}),check('city').isLength({min:1,max:100}),check('state').isLength({min:1,max:2}),check('zipcode').isLength({min:5,max:9}),(req,res)=>{
-    let user=users.findIndex(u=>u.id==req.params.id)
-    console.log(user)
-    const {name,address,address2,city,state,zipcode}=req.body
-    if(user==-1)
-      return res.status(401).json({message:'unauthorized'})
-    const error = validationResult(req)
-    if(!error.isEmpty()){
-      
-      return res.status(400).json(error.array())
-    }
-    users[user]={...users[user],name,address,address2,city,state,zipcode}
-  })
+  if (user == null)
+    return res.status(401).json({ message: 'unauthorized' })
 
-  app.post('/register',check('RegisterUsername','No Username Provided').notEmpty().custom(val=>users.find(u=>u.username === val) == null ).withMessage('Username Already Exists'),check('RegisterPassword', 'No Password Provided').notEmpty(),(req,res)=>{
-    const error = validationResult(req)
-    console.log(req.body.RegisterUsername)
-    console.log(req.body.RegisterPassword)
-    if(!error.isEmpty()){
-      
-      return res.status(400).json(error.array())
-    }
-    users.push({
-      username: req.body.RegisterUsername, 
-      password:req.body.RegisterPassword,
-      name:null,
-      address:null,
-      address2:null,
-      city:null,
-      state:null,
-      zipcode:null,
-      quoteHistory:[{gallons_requested:5,delivery_address:'11453 Chicago Lane',delivery_date:'5-1-21',suggested_price:120,total_price:240},{gallons_requested:8,delivery_address:'11453 Apple Lane',delivery_date:'5-12-21',suggested_price:450,total_price:650}],
-      id: ids++
-    
-    }),
-      
-
-    res.send('Successful Register!')
-  })
-
-app.listen(3001, () =>{
-    console.log("works on 3001!");
+  res.send(user.quoteHistory)
 });
 
-module.exports=app
+app.post('/profile/:id', check('name').isLength({ min: 1, max: 50 }), check('address').isLength({ min: 10, max: 100 }), check('city').isLength({ min: 1, max: 100 }), check('state').isLength({ min: 1, max: 2 }), check('zipcode').isLength({ min: 5, max: 9 }), async (req, res) => {
+  
+  let user = await ClientInformation.findOne({where:{UserId:req.params.id}})
+  const { name, address, address2, city, state, zipcode } = req.body
+  if (user == null)
+    return res.status(401).json({ message: 'unauthorized' })
+  const error = validationResult(req)
+  if (!error.isEmpty()) {
+    return res.status(400).json(error.array())
+  }
+  
+  await user.update({ Name:name, Address1:address,Address2:address2,City:city,State:state,ZipCode:zipcode })
+  res.send('done')
+
+})
+
+app.post('/register', check('RegisterUsername', 'No Username Provided').notEmpty().custom(async val => {
+  
+  let res = await UserCredentials.findOne({where: {username: val}})
+  if(res != null){
+    return Promise.reject()
+  }
+  
+}).withMessage('Username Already Exists'), check('RegisterPassword', 'No Password Provided').notEmpty(), async (req, res) => {
+  const error = validationResult(req)
+  if (!error.isEmpty()) {
+
+    return res.status(400).json(error.array())
+  }
+  try {
+    const res = await UserCredentials.create({ Username: req.body.RegisterUsername, Password: req.body.RegisterPassword })
+    const x= await ClientInformation.create({UserId:res.dataValues.userId})
+
+  }
+  catch (err) {
+    console.log(err)
+    return res.status(500).json(err)
+  }
+
+  return res.send('Successful Register!')
+})
+
+app.listen(3001, () => {
+  console.log("works on 3001!");
+  sequelize.authenticate()
+});
+
+module.exports = app
 
 
 

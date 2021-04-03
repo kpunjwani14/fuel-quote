@@ -50,11 +50,19 @@ describe('App',()=>{
     })
     it('app should not get history of quotes',()=>{
         request(app).get('/showtable/1').expect(200,(err,res)=>{
-            console.log(res.status,'hi')
+            
             
             assert.equal(res.status,401)})
+            
+            
         
 
     })
+    it('app should close',()=>{
+        process.exit(0)
+    })
+    
+    
 
 })
+
