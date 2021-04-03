@@ -50,13 +50,15 @@ function start(pass) {
   })
 }
 app.get('/profile/:id', async (req, res) => {
-  console.log(req.params.id)
-  const user = ClientInformation.findOne({where:{ClientId:req.params.id}} )
+  const test = await ClientInformation.findAll({include:{UserCredentials}})
+  console.log(test)
+  const user = await ClientInformation.findOne({where:{UserId:req.params.id}} )
+
   if (user == null) {
 
     return res.status(400).json({ message: 'invalid profile' })
   }
-  res.send(user)
+  res.send({ name:user.Name, address:user.Address1,address2:user.Address2,city:user.City,state:user.State,zipcode:user.ZipCode })
 })
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
@@ -89,6 +91,7 @@ app.post('/getPrice', (req, res) => {
   res.send('Implementing in Next Assignment')
 })
 app.get("/showtable/:id", (req, res) => {
+  
   const user = users.find(u => u.id == req.params.id)
 
   if (user == null)
