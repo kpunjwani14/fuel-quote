@@ -61,7 +61,7 @@ app.get('/profile/:id', async (req, res) => {
 })
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
-
+  
   res.send({ id: req.user.userId })
 })
 
