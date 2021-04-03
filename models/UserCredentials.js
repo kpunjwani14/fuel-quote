@@ -1,8 +1,13 @@
-const { Model } = require('sequelize');
+'use strict';
+const {
+  Model
+} = require('sequelize');
 
 module.exports =
     (sequelize, DataTypes) => {
-        class UserCredentials extends Model { }
+        class UserCredentials extends Model { 
+            
+        }
 
         UserCredentials.init({
             // Model attributes are defined here
@@ -28,6 +33,11 @@ module.exports =
             modelName: 'UserCredentials',// We need to choose the model name
             tableName: 'User_Credentials'
         });
+        UserCredentials.associate = (model) =>{
+            UserCredentials.hasOne(model.ClientInformation,{
+            foreignKey:'UserId',
+            allowNull:false
+          })}
         return UserCredentials
     }
 

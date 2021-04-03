@@ -85,16 +85,16 @@ function QuoteHistory() {
       <div className="table">
         <button onClick={getTable}>Show Table Info</button>
         {tableInfo.map((val, key) => {
-          console.log(val.gallons_requested);
+          
           return (
             <>
               <div className="quotes">
                 <div>
-                  <h3>Gallons: {val.gallons_requested}</h3>
-                  <h3>Address: {val.delivery_address}</h3>
-                  <h3>Date: {val.delivery_date}</h3>
-                  <h3>Suggested Price: {val.suggested_price}</h3>
-                  <h3>Total Price: {val.total_price}</h3>
+                  <h3>Gallons: {val.Gallons}</h3>
+                  <h3>Address: {val.DeliveryAddress}</h3>
+                  <h3>Date: {val.DeliveryDate}</h3>
+                  <h3>Suggested Price: {val.SuggestedPrice}</h3>
+                  <h3>Total Price: {val.TotalPrice}</h3>
                 </div>
               </div>
               <hr />

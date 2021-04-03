@@ -55,12 +55,19 @@ describe('App',()=>{
             assert.equal(res.status,401)})
             
             
-        
 
     })
-    it('app should close',()=>{
-        process.exit(0)
+    it('app should not get profile',()=>{
+        request(app).get('/profile/100').expect(400,(err,res)=>{
+            assert.equal(res.status,400)
+        })
     })
+    it('app should get profile',()=>{
+        request(app).get('/profile/30').expect(400,(err,res)=>{
+            assert.equal(res.status,200)
+        })
+    })
+    
     
     
 

@@ -1,4 +1,4 @@
-const UserCredentials = require('./UserCredentials')
+
 'use strict';
 const {
   Model
@@ -10,9 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // define association here
-    }
+    
   };
   ClientInformation.init({
     ClientId: {
@@ -54,11 +52,11 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'ClientInformation',
   });
-  ClientInformation.associate(models =>
-    ClientInformation.hasOne(models.UserCredentials,{
-    name:'UserId',
-    allowNull:false
-  })
-  )
+  ClientInformation.associate = (model)=>{
+    ClientInformation.hasMany(model.FuelQuote,{
+      foreignKey:'ClientId',
+      allowNull:false
+    })}
+  
   return ClientInformation;
 };

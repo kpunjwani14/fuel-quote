@@ -14,6 +14,7 @@ function ProfileManagement() {
         try {
             let res = await axios.get('http://localhost:3001/profile/' + id)
             setFormData(res.data)
+            console.log('this is a test')
 
         }
         catch (e) {

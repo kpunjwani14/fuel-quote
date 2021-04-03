@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { sequelize, UserCredentials,ClientInformation } = require('../models')
+const { sequelize, UserCredentials,ClientInformation,FuelQuote } = require('../models')
 //const mysql = require('mysql');
 const cors = require("cors");
 const { body, validationResult, check } = require('express-validator');
@@ -50,8 +50,7 @@ function start(pass) {
   })
 }
 app.get('/profile/:id', async (req, res) => {
-  const test = await ClientInformation.findAll({include:{UserCredentials}})
-  console.log(test)
+  
   const user = await ClientInformation.findOne({where:{UserId:req.params.id}} )
 
   if (user == null) {
@@ -90,14 +89,14 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
 app.post('/getPrice', (req, res) => {
   res.send('Implementing in Next Assignment')
 })
-app.get("/showtable/:id", (req, res) => {
+app.get("/showtable/:id", async (req, res) => {
   
-  const user = users.find(u => u.id == req.params.id)
-
+  const user = await ClientInformation.findOne({where:{UserId:req.params.id},include:FuelQuote})
+  
   if (user == null)
     return res.status(401).json({ message: 'unauthorized' })
 
-  res.send(user.quoteHistory)
+  res.send(user.dataValues.FuelQuotes)
 });
 
 app.post('/profile/:id', check('name').isLength({ min: 1, max: 50 }), check('address').isLength({ min: 10, max: 100 }), check('city').isLength({ min: 1, max: 100 }), check('state').isLength({ min: 1, max: 2 }), check('zipcode').isLength({ min: 5, max: 9 }), async (req, res) => {
@@ -130,8 +129,10 @@ app.post('/register', check('RegisterUsername', 'No Username Provided').notEmpty
     return res.status(400).json(error.array())
   }
   try {
-    const res = await UserCredentials.create({ Username: req.body.RegisterUsername, Password: req.body.RegisterPassword })
-    const x= await ClientInformation.create({UserId:res.dataValues.userId})
+    const result  = await UserCredentials.create({ Username: req.body.RegisterUsername, Password: req.body.RegisterPassword })
+    const profile = await ClientInformation.create({UserId:result.dataValues.userId})
+    await FuelQuote.create({DeliveryAddress:'12345 Albany Lane',SuggestedPrice:300,TotalPrice:350,ClientId:profile.dataValues.ClientId,Gallons: 5,DeliveryDate:'2012-06-22 05:40:06' })
+    await FuelQuote.create({DeliveryAddress:'45638 Albany Lane',SuggestedPrice:200,TotalPrice:250,ClientId:profile.dataValues.ClientId,Gallons: 8,DeliveryDate:'2012-06-22 05:40:06' })
 
   }
   catch (err) {
