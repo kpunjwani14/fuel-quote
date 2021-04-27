@@ -66,7 +66,7 @@ function LoginScreen(props) {
                             required
                             name='password'
                             onChange={onLogChange}
-                            type="text"
+                            type="password"
                         />
                         <Form.Control.Feedback type="invalid">
                             Password doesn't meet requirements.

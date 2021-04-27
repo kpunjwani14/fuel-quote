@@ -58,7 +58,7 @@ function LoginScreen(props) {
                             minLength={10}
                             maxLength={100}
                             required
-                            type="text"
+                            type="password"
                             name='RegisterPassword'
                             onChange={onInputChange}
                         />
@@ -75,7 +75,7 @@ function LoginScreen(props) {
                             minLength={10}
                             maxLength={100}
                             required
-                            type="text"
+                            type="password"
                             name='confirm'
                             onChange={onInputChange}
                         />
