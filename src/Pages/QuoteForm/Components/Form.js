@@ -113,7 +113,7 @@ function ProfileManagement() {
                         <Form.Control type="text" placeholder="77047" value ={addressData.zipcode} readOnly />
                     </Form.Group>
                 </Form.Row>
-                <Button disabled={!date ? true : false} size="lg" style={{ float: "right" }} onClick={handleClick}>Get New Quote</Button>
+                <Button disabled={!date || !gallons ? true : false} size="lg" style={{ float: "right" }} onClick={handleClick}>Get New Quote</Button>
 
                 <br />
                 <br />
@@ -123,7 +123,7 @@ function ProfileManagement() {
                     <div className="header" style={{ textAlign: 'right' }}>
                         <h5>{`Suggested Price per Gallon: $${pricePerGallon.toFixed(2)}`}</h5>
                         <h5>{`Total Amount Due: $${total.toFixed(2)}`}</h5>
-                        <Button onClick={handleSubmit} disabled={!date ? true : false} size="lg" style={{ float: "right" }}>Submit Quote</Button>
+                        <Button onClick={handleSubmit} disabled={!date || !gallons ? true : false} size="lg" style={{ float: "right" }}>Submit Quote</Button>
                     </div>
                 }
             </Form>}
