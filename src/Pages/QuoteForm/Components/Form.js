@@ -40,7 +40,6 @@ function ProfileManagement() {
             try{
                 let calculations = await axios.get(`http://localhost:3001/getPrice?gallonsRequested=${gallons}`,{headers:{"Authorization":`Bearer ${localStorage.getItem('token')}`}})
                 setPricePerGallon(calculations.data.suggestedPricePerGallon)
-                console.log(calculations.data.totalAmountDue)
                 setTotal(calculations.data.totalAmountDue)
                 setIsClicked(true);
             }
@@ -78,11 +77,14 @@ function ProfileManagement() {
                 <Form.Row>
                     <Form.Group as={Col} md="5">
                         <Form.Label className="required">Gallons requested</Form.Label>
-                        <div>
+                        {/* <div>
                             <Button onClick={decrement} variant="primary">-</Button>{' '}
                             <h5 style={{ display: "inline", padding: "5px" }}>{gallons}</h5>
                             <Button onClick={increment} variant="primary">+</Button>{' '}
-                        </div>
+                        </div> */}
+                        <Form.Control type='number' min={1} value={gallons} onChange={e=>setGallons(e.target.value)}/>
+
+
                     </Form.Group>
 
                     <Form.Group as={Col} md="2">
