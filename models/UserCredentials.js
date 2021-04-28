@@ -34,10 +34,11 @@ module.exports =
             tableName: 'User_Credentials'
         });
         UserCredentials.associate = (model) =>{
-            UserCredentials.hasOne(model.ClientInformation,{
+            UserCredentials.Info = UserCredentials.hasOne(model.ClientInformation,{
             foreignKey:'UserId',
             allowNull:false
           })}
+        
         return UserCredentials
     }
 

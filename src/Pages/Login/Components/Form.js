@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Col } from 'react-bootstrap';
 import SubmitButton from "../../../Components/Buttons/SubmitButton";
 import axios from 'axios'
@@ -13,6 +13,19 @@ function LoginScreen(props) {
     const onLogChange = (event) => {
         setLogForm(prevState => ({ ...prevState, [event.target.name]: event.target.value }))
     }
+    useEffect(async () => {
+        try {
+
+            let res = await axios.get('http://localhost:3001/auth',{headers:{"Authorization":`Bearer ${localStorage.getItem('token')}`}})
+            history.push('/profile')
+
+        }
+        catch (e) {
+            console.log('not valid')
+           
+        }
+    }, []
+    )
     const handleSubmit = async (event) => {
         const form = event.currentTarget;
 
@@ -21,8 +34,8 @@ function LoginScreen(props) {
         if (form.checkValidity() === true) {
             try {
                 const res = await axios.post('http://localhost:3001/login', logForm);
-
-                history.push('/profile/' + res.data.id);
+                localStorage.setItem('token',res.data.token)
+                history.push('/profile');
                 notify.show('Success', 'success', 3000);
             }
             catch (e) {

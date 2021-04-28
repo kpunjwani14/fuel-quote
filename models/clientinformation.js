@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'ClientInformation',
   });
   ClientInformation.associate = (model)=>{
-    ClientInformation.hasMany(model.FuelQuote,{
+    ClientInformation.Quotes = ClientInformation.hasMany(model.FuelQuote,{
       foreignKey:'ClientId',
       allowNull:false
     })}

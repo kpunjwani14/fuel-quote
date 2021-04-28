@@ -1,127 +1,123 @@
 const express = require("express");
+const jwt = require('jsonwebtoken')
 const app = express();
-const { sequelize, UserCredentials,ClientInformation,FuelQuote } = require('../models')
-//const mysql = require('mysql');
+const { sequelize, UserCredentials, ClientInformation, FuelQuote } = require('../models')
 const cors = require("cors");
 const { body, validationResult, check } = require('express-validator');
 const passport = require('passport')
-const session = require('express-session')
 app.use(cors());
-app.use(session({
-  secret: 'hello_world',
-  resave: false,
-  saveUninitialized: false
-}))
 app.use(express.json());
 app.use(passport.initialize())
-app.use(passport.session())
-var users = []
-var ids = 0
 
-// change stuff here to make it connect to your localhost db 
-// const db = mysql.createConnection({
-//     host: "localhost",
-//     user: 'root',
-//     host: 'localhost',
-//     password: '00000000',
-//     database: 'sys',
-// });
+
+const auth = (req, res, next) => {
+  let token = req.headers.authorization
+  if (!token || token == '')
+    return res.status(401).send()
+  token = token.split(' ')
+  if (!token[1])
+    return res.status(401).send()
+  jwt.verify(token[1], 'hellosecret', (err, user) => {
+
+    if (err)
+      return res.status(403).send()
+    req.user = user
+    next()
+  })
+}
+
 const local = require('passport-local').Strategy
 start(passport)
 function start(pass) {
   pass.use(new local(async (username, password, done) => {
-    const user = await UserCredentials.findOne({where:{Username:username,Password:password}})
-    
+    const user = await UserCredentials.findOne({ where: { Username: username, Password: password } })
     if (user == null)
       return done(null, false, { message: 'Credentials Do Not Match Any Current Users' })
-    return done(null, user.dataValues)
+
+    let result = jwt.sign({ username: user.dataValues.Username, id: user.dataValues.userId }, 'hellosecret', { expiresIn: 3600 })
+
+    return done(null, { token: result, userId: user.dataValues.userId, username: user.dataValues.Username })
 
   }))
   pass.serializeUser((user, done) => {
-  
     return done(null, user.userId)
-
 
   })
   pass.deserializeUser(async (id, done) => {
-    const user = await UserCredentials.findOne({where:{userId:id}})
+    const user = await UserCredentials.findOne({ where: { userId: id } })
     return done(null, user)
 
   })
 }
-app.get('/profile/:id', async (req, res) => {
+app.get('/profile', auth, async (req, res) => {
+
+  const user = await ClientInformation.findOne({ where: { UserId: req.user.id } })
+
   
-  const user = await ClientInformation.findOne({where:{UserId:req.params.id}} )
 
-  if (user == null) {
-
-    return res.status(400).json({ message: 'invalid profile' })
-  }
-  res.send({ name:user.Name, address:user.Address1,address2:user.Address2,city:user.City,state:user.State,zipcode:user.ZipCode })
+  res.send({ name: user.Name, address: user.Address1, address2: user.Address2, city: user.City, state: user.State, zipcode: user.ZipCode })
 })
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
-  
-  res.send({ id: req.user.userId })
+
+  res.send(req.user)
 })
 
 
-// app.post('/create', (req, res) => {
-//     const gallons_requested = req.body.gallons_requested;
-//     const delivery_address = req.body.delivery_address;
-//     const delivery_date = req.body.delivery_date;
-//     const suggested_price = req.body.suggested_price;
-//     const total_price = req.body.total_price;
+app.get('/getPrice', auth, async (req, res) => {
 
-//     // db.query(
-//     //     'INSERT INTO sys.quote_history (gallons_requested, delivery_address, delivery_date, suggested_price, total_price) VALUES (?,?,?,?,?)' 
-//     //     [gallons_requested, delivery_address, delivery_date, suggested_price, total_price],
-//     //     (err, result) => {
-//     //         if (err){
-//     //             console.log(err);
-//     //         } else{
-//     //             res.send("values inserted");
-//     //         }
-//     //     }
-//     // );
-// });
-//empty for pricing module 
-app.post('/getPrice', (req, res) => {
-  res.send('Implementing in Next Assignment')
+  let userData = await ClientInformation.findOne({ where: { UserId: req.user.id }, include: FuelQuote })
+  userData = userData.dataValues
+  let margin = 1.50 * (((userData.State == 'TX' ? 2 : 4) - (userData.FuelQuotes.length > 0 ? 1 : 0) + (req.query.gallonsRequested > 1000 ? 2 : 3) + 10) * .01)
+  res.send({ margin: margin, suggestedPricePerGallon: 1.50 + margin, totalAmountDue: (1.50 + margin) * req.query.gallonsRequested })
+
+
+
 })
-app.get("/showtable/:id", async (req, res) => {
-  
-  const user = await ClientInformation.findOne({where:{UserId:req.params.id},include:FuelQuote})
-  
-  if (user == null)
-    return res.status(401).json({ message: 'unauthorized' })
+
+app.post('/submitQuotes', auth, async (req, res) => {
+  let { DeliveryDate, SuggestedPrice, TotalPrice,Gallons } = req.body
+  try {
+    let ClientId = await ClientInformation.findOne({ attributes: ['ClientId','Address1'], where: { UserId: req.user.id } })
+    ClientId = ClientId.dataValues
+    await FuelQuote.create({ DeliveryDate, SuggestedPrice, TotalPrice, ClientId:ClientId.ClientId,Gallons,DeliveryAddress:ClientId.Address1 })
+    res.send('uploaded quote')
+  }
+  catch (e) {
+    console.log(e)
+  }
+})
+
+app.get("/showTable", auth, async (req, res) => {
+
+  const user = await ClientInformation.findOne({ where: { UserId: req.user.id }, include: FuelQuote })
+
 
   res.send(user.dataValues.FuelQuotes)
 });
 
-app.post('/profile/:id', check('name').isLength({ min: 1, max: 50 }), check('address').isLength({ min: 10, max: 100 }), check('city').isLength({ min: 1, max: 100 }), check('state').isLength({ min: 1, max: 2 }), check('zipcode').isLength({ min: 5, max: 9 }), async (req, res) => {
-  
-  let user = await ClientInformation.findOne({where:{UserId:req.params.id}})
+app.post('/profile', auth, check('name').isLength({ min: 1, max: 50 }), check('address').isLength({ min: 10, max: 100 }), check('city').isLength({ min: 1, max: 100 }), check('state').isLength({ min: 1, max: 2 }), check('zipcode').isLength({ min: 5, max: 9 }), async (req, res) => {
+
+
+  let user = await ClientInformation.findOne({ where: { UserId: req.user.id } })
   const { name, address, address2, city, state, zipcode } = req.body
-  if (user == null)
-    return res.status(401).json({ message: 'unauthorized' })
   const error = validationResult(req)
   if (!error.isEmpty()) {
     return res.status(400).json(error.array())
   }
-  
-  await user.update({ Name:name, Address1:address,Address2:address2,City:city,State:state,ZipCode:zipcode })
+
+  await user.update({ Name: name, Address1: address, Address2: address2, City: city, State: state, ZipCode: zipcode })
   res.send('done')
 
 })
 
 app.post('/register', check('RegisterUsername', 'No Username Provided').notEmpty().custom(async val => {
-  
-  let res = await UserCredentials.findOne({where: {username: val}})
-  if(res != null){
+
+  let res = await UserCredentials.findOne({ where: { username: val } })
+  if (res != null) {
     return Promise.reject()
   }
-  
+
 }).withMessage('Username Already Exists'), check('RegisterPassword', 'No Password Provided').notEmpty(), async (req, res) => {
   const error = validationResult(req)
   if (!error.isEmpty()) {
@@ -129,10 +125,18 @@ app.post('/register', check('RegisterUsername', 'No Username Provided').notEmpty
     return res.status(400).json(error.array())
   }
   try {
-    const result  = await UserCredentials.create({ Username: req.body.RegisterUsername, Password: req.body.RegisterPassword })
-    const profile = await ClientInformation.create({UserId:result.dataValues.userId})
-    await FuelQuote.create({DeliveryAddress:'12345 Albany Lane',SuggestedPrice:300,TotalPrice:350,ClientId:profile.dataValues.ClientId,Gallons: 5,DeliveryDate:'2012-06-22 05:40:06' })
-    await FuelQuote.create({DeliveryAddress:'45638 Albany Lane',SuggestedPrice:200,TotalPrice:250,ClientId:profile.dataValues.ClientId,Gallons: 8,DeliveryDate:'2012-06-22 05:40:06' })
+
+    const result = await UserCredentials.create({
+      Username: req.body.RegisterUsername,
+      Password: req.body.RegisterPassword,
+      ClientInformation: {
+      }
+    },
+      {
+        include: [{ association: UserCredentials.Info }]
+      })
+
+
 
   }
   catch (err) {
@@ -142,6 +146,18 @@ app.post('/register', check('RegisterUsername', 'No Username Provided').notEmpty
 
   return res.send('Successful Register!')
 })
+
+app.delete('/deleteAll', async (req, res) => {
+
+  await FuelQuote.destroy({ where: {} })
+  await ClientInformation.destroy({ where: {} })
+  await UserCredentials.destroy({ where: {} })
+  res.send('done')
+})
+
+app.get('/auth', auth, (req, res) => res.send('authenticated'))
+
+
 
 app.listen(3001, () => {
   console.log("works on 3001!");

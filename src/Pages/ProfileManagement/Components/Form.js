@@ -9,12 +9,14 @@ import Notifications, { notify } from 'react-notify-toast';
 
 function ProfileManagement() {
     const [isValid, setValid] = useState(true)
+    const [isLoading,setLoading] = useState(true)
     let { id } = useParams()
     useEffect(async () => {
         try {
-            let res = await axios.get('http://localhost:3001/profile/' + id)
+
+            let res = await axios.get('http://localhost:3001/profile',{headers:{"Authorization":`Bearer ${localStorage.getItem('token')}`}})
             setFormData(res.data)
-            console.log('this is a test')
+            setLoading(false)
 
         }
         catch (e) {
@@ -25,19 +27,26 @@ function ProfileManagement() {
     )
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState({ name: null, state: null, address: null, address2: null, city: null, zipcode: null })
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         const form = event.currentTarget;
-
+        event.preventDefault();
+        event.stopPropagation();
         if (form.checkValidity() === true) {
+            
+            console.log(formData,'hello');
+            try{
+            await axios.post('http://localhost:3001/profile', formData,{headers:{"Authorization":`Bearer ${localStorage.getItem('token')}`}});
             notify.show('Changes saved', 'success', 3000);
-            console.log(formData);
-            axios.post('http://localhost:3001/profile/' + id, formData);
+            }
+            catch(err){
+                console.log(err.statusCode)
+                notify.show('Something went Wrong Please try Again', 'error', 3000);
+            }
         }
         else {
             notify.show('Missing fields', 'error', 3000);
         }
-        event.preventDefault();
-        event.stopPropagation();
+        
         setValidated(true);
     }
     const onProfileChange = (event) => {
@@ -49,6 +58,7 @@ function ProfileManagement() {
     return (
         !isValid ? <Redirect to='/' /> :
             <>
+            {!isLoading &&
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Row>
                         <Form.Group as={Col} md="6" controlId="validationCustom01">
@@ -143,6 +153,7 @@ function ProfileManagement() {
 
                     <SubmitButton text={'Save'} type={'submit'} />
                 </Form>
+}
             </>
 
     )

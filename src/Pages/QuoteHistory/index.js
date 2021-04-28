@@ -1,7 +1,7 @@
 import React from "react";
 import Navigation from "../../Layout/Navbar/Navigation";
 import Table from 'react-bootstrap/Table';
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import axios from 'axios';
 import { NavDropdown } from "react-bootstrap";
 import { useParams, useHistory } from 'react-router-dom'
@@ -73,26 +73,28 @@ function QuoteHistory() {
 
   const [tableInfo, setTableInfo] = useState([]);
 
-  const getTable = () => {
-    axios.get("http://localhost:3001/showtable/" + id).then((response) => {
+   useEffect( ()=>{
+    axios.get("http://localhost:3001/showTable",{headers:{"Authorization":`Bearer ${localStorage.getItem('token')}`}}).then((response) => {
       setTableInfo(response.data);
     }).catch(e => history.push('/'));
-  };
+  },[]);
 
 
   return (
+    <>
+    <Navigation />
     <div className="App">
       <div className="table">
-        <button onClick={getTable}>Show Table Info</button>
+        {/* <button onClick={getTable}>Show Table Info</button> */}
         {tableInfo.map((val, key) => {
           
           return (
             <>
-              <div className="quotes">
+              <div key={key} className="quotes">
                 <div>
                   <h3>Gallons: {val.Gallons}</h3>
                   <h3>Address: {val.DeliveryAddress}</h3>
-                  <h3>Date: {val.DeliveryDate}</h3>
+                  <h3>Date: {new Date(val.DeliveryDate).toDateString()}</h3>
                   <h3>Suggested Price: {val.SuggestedPrice}</h3>
                   <h3>Total Price: {val.TotalPrice}</h3>
                 </div>
@@ -103,6 +105,7 @@ function QuoteHistory() {
         })}
       </div>
     </div>
+    </>
   );
 
 
