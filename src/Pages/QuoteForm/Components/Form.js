@@ -64,7 +64,7 @@ function ProfileManagement() {
         }
         catch (e) {
             console.log('not valid')
-            history.push('/profile')
+            history.push('/')
 
         }
     }, []

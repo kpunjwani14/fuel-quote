@@ -10,6 +10,8 @@ import Notifications, { notify } from 'react-notify-toast';
 function ProfileManagement() {
     const [isValid, setValid] = useState(true)
     const [isLoading,setLoading] = useState(true)
+    const [validated, setValidated] = useState(false);
+    const [formData, setFormData] = useState({ name: null, state: null, address: null, address2: null, city: null, zipcode: null })
     let { id } = useParams()
     useEffect(async () => {
         try {
@@ -20,13 +22,10 @@ function ProfileManagement() {
 
         }
         catch (e) {
-            console.log('not valid')
             setValid(false)
         }
-    }, []
-    )
-    const [validated, setValidated] = useState(false);
-    const [formData, setFormData] = useState({ name: null, state: null, address: null, address2: null, city: null, zipcode: null })
+    }, [])
+    
     const handleSubmit = async (event) => {
         const form = event.currentTarget;
         event.preventDefault();

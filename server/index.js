@@ -17,10 +17,13 @@ const auth = (req, res, next) => {
   token = token.split(' ')
   if (!token[1])
     return res.status(401).send()
-  jwt.verify(token[1], 'hellosecret', (err, user) => {
+  jwt.verify(token[1], 'hellosecret', async (err, user) => {
 
     if (err)
       return res.status(403).send()
+    let checkUser = await UserCredentials.findOne({where:{userId:user.id}})
+    if(checkUser == null)
+      return res.status(401).send()
     req.user = user
     next()
   })
@@ -52,7 +55,6 @@ function start(pass) {
 app.get('/profile', auth, async (req, res) => {
 
   const user = await ClientInformation.findOne({ where: { UserId: req.user.id } })
-
   
 
   res.send({ name: user.Name, address: user.Address1, address2: user.Address2, city: user.City, state: user.State, zipcode: user.ZipCode })
